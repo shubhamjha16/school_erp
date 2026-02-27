@@ -45,6 +45,9 @@ def record_payment(
     if payload.amount_paid <= 0:
         raise HTTPException(status_code=400, detail="Invalid amount")
 
+    if payload.payment_mode not in {"cash", "card", "upi", "bank"}:
+        raise HTTPException(status_code=400, detail="Invalid payment mode")
+
     payment = FeePayment(**payload.model_dump())
     db.add(payment)
 

@@ -11,6 +11,7 @@ from .routers.notifications import router as notifications_router
 from .routers.dashboard import router as dashboard_router
 from .routers.exams import router as exams_router
 from .routers.fees import router as fees_router
+from .routers.parent_portal import router as parent_portal_router
 
 app = FastAPI(title="School ERP API", version="0.1.0")
 
@@ -40,3 +41,5 @@ app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(exams_router, prefix="/api/v1")
 
 app.include_router(fees_router, prefix="/api/v1")
+
+app.include_router(parent_portal_router, prefix="/api/v1")

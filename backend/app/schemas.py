@@ -191,3 +191,19 @@ class FeePaymentCreate(BaseModel):
 
 class FeePaymentOut(FeePaymentCreate):
     id: int
+
+
+class ParentStudentSummaryOut(BaseModel):
+    id: int
+    admission_no: str
+    full_name: str
+    class_name: str
+    section: str
+
+
+class ParentDashboardOut(BaseModel):
+    total_students: int
+    attendance_records: int
+    report_cards: int
+    fee_invoices: int
+    fee_due_count: int

@@ -285,3 +285,77 @@ def test_sprint_9_10_fee_invoices_and_payments():
     payments_resp = client.get("/api/v1/fees/payments", headers=admin_headers)
     assert payments_resp.status_code == 200
     assert len(payments_resp.json()) >= 1
+
+
+def test_sprint_11_12_parent_portal_and_hardening():
+    admin_token = create_user_and_login("admin1112@school.com", "school_admin")
+    parent_token = create_user_and_login("parent1112@school.com", "parent")
+
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+    parent_headers = {"Authorization": f"Bearer {parent_token}"}
+
+    students = client.get("/api/v1/students", headers=admin_headers).json()
+    if not students:
+        client.post(
+            "/api/v1/students",
+            headers=admin_headers,
+            json={"admission_no": "ADM-1112", "full_name": "Ishita Rao", "class_name": "Grade 10", "section": "A"},
+        )
+        students = client.get("/api/v1/students", headers=admin_headers).json()
+    student_id = students[0]["id"]
+
+    guardian_resp = client.post(
+        "/api/v1/sis/guardians",
+        headers=admin_headers,
+        json={"full_name": "Rohit Rao", "phone": "8888888888", "relation": "father"},
+    )
+    assert guardian_resp.status_code == 201
+    guardian_id = guardian_resp.json()["id"]
+
+    map_resp = client.post(
+        "/api/v1/sis/student-guardians",
+        headers=admin_headers,
+        json={"student_id": student_id, "guardian_id": guardian_id},
+    )
+    assert map_resp.status_code == 201
+
+    # hardening check: invalid marks should fail
+    exam_resp = client.post(
+        "/api/v1/exams",
+        headers=admin_headers,
+        json={"name": "Term 2", "academic_year": "2026-27"},
+    )
+    assert exam_resp.status_code == 201
+    exam_id = exam_resp.json()["id"]
+
+    bad_mark = client.post(
+        "/api/v1/exams/marks",
+        headers=admin_headers,
+        json={"student_id": student_id, "exam_id": exam_id, "subject": "Science", "marks_obtained": 120, "max_marks": 100},
+    )
+    assert bad_mark.status_code == 400
+
+    # hardening check: invalid payment mode should fail
+    invoice_resp = client.post(
+        "/api/v1/fees/invoices",
+        headers=admin_headers,
+        json={"student_id": student_id, "term": "Term 2", "amount_due": 42000, "status": "due"},
+    )
+    assert invoice_resp.status_code == 201
+
+    bad_payment = client.post(
+        "/api/v1/fees/payments",
+        headers=admin_headers,
+        json={"invoice_id": invoice_resp.json()["id"], "amount_paid": 1000, "payment_mode": "crypto", "transaction_ref": "BAD-1"},
+    )
+    assert bad_payment.status_code == 400
+
+    # parent portal endpoints
+    student_list_resp = client.get(f"/api/v1/parent/students/{guardian_id}", headers=parent_headers)
+    assert student_list_resp.status_code == 200
+    assert len(student_list_resp.json()) >= 1
+
+    dashboard_resp = client.get(f"/api/v1/parent/dashboard/{guardian_id}", headers=parent_headers)
+    assert dashboard_resp.status_code == 200
+    body = dashboard_resp.json()
+    assert body["total_students"] >= 1

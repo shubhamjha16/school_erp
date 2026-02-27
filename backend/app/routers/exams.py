@@ -43,6 +43,9 @@ def add_mark(
     if not exam:
         raise HTTPException(status_code=404, detail="Exam not found")
 
+    if payload.marks_obtained < 0 or payload.max_marks <= 0 or payload.marks_obtained > payload.max_marks:
+        raise HTTPException(status_code=400, detail="Invalid marks range")
+
     mark = StudentMark(**payload.model_dump())
     db.add(mark)
     db.commit()

@@ -302,5 +302,10 @@ If you want, the next iteration can include:
 - Sprint 9-10 (implemented):
   - Fee invoice APIs
   - Fee payment and status update APIs
-- Sprint 11+ (next):
-  - Parent portal
+- Sprint 11-12 (implemented):
+  - Parent portal student list API
+  - Parent portal dashboard metrics API
+  - Hardening validations for marks and payment mode
+  - UAT checklist added
+- Sprint 13+ (next):
+  - Production hardening, async notifications, and deployment automation

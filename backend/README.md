@@ -12,6 +12,8 @@ This backend initializes the first implementation slice of the ERP:
 - Dashboard metrics API (Sprint 5-6)
 - Exam and report card APIs (Sprint 7-8)
 - Fee invoices and payment APIs (Sprint 9-10)
+- Parent portal APIs (Sprint 11-12)
+- UAT checklist doc (Sprint 11-12)
 - Student module CRUD starter (create/list)
 - SQLite persistence (for local development)
 
@@ -64,5 +66,7 @@ pytest
 - `GET /api/v1/fees/invoices` (authenticated)
 - `POST /api/v1/fees/payments` (school_admin/principal/accountant)
 - `GET /api/v1/fees/payments` (authenticated)
+- `GET /api/v1/parent/students/{guardian_id}` (parent/school_admin/principal)
+- `GET /api/v1/parent/dashboard/{guardian_id}` (parent/school_admin/principal)
 - `POST /api/v1/students` (school_admin/principal)
 - `GET /api/v1/students` (authenticated)
