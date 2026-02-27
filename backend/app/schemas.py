@@ -169,3 +169,25 @@ class ReportCardOut(ReportCardCreate):
     total_obtained: int
     total_max: int
     percentage: str
+
+
+class FeeInvoiceCreate(BaseModel):
+    student_id: int
+    term: str
+    amount_due: int
+    status: str = "due"
+
+
+class FeeInvoiceOut(FeeInvoiceCreate):
+    id: int
+
+
+class FeePaymentCreate(BaseModel):
+    invoice_id: int
+    amount_paid: int
+    payment_mode: str
+    transaction_ref: str
+
+
+class FeePaymentOut(FeePaymentCreate):
+    id: int

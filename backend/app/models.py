@@ -155,3 +155,23 @@ class ReportCard(Base):
     total_obtained: Mapped[int] = mapped_column(Integer, nullable=False)
     total_max: Mapped[int] = mapped_column(Integer, nullable=False)
     percentage: Mapped[str] = mapped_column(String(20), nullable=False)
+
+
+class FeeInvoice(Base):
+    __tablename__ = "fee_invoices"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    term: Mapped[str] = mapped_column(String(50), nullable=False)
+    amount_due: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="due")
+
+
+class FeePayment(Base):
+    __tablename__ = "fee_payments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    invoice_id: Mapped[int] = mapped_column(ForeignKey("fee_invoices.id"), nullable=False, index=True)
+    amount_paid: Mapped[int] = mapped_column(Integer, nullable=False)
+    payment_mode: Mapped[str] = mapped_column(String(20), nullable=False)  # cash/card/upi/bank
+    transaction_ref: Mapped[str] = mapped_column(String(100), nullable=False)

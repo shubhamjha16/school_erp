@@ -241,3 +241,47 @@ def test_sprint_7_8_exams_marks_report_cards():
     list_resp = client.get(f"/api/v1/exams/report-cards/{student_id}", headers=admin_headers)
     assert list_resp.status_code == 200
     assert len(list_resp.json()) >= 1
+
+
+def test_sprint_9_10_fee_invoices_and_payments():
+    admin_token = create_user_and_login("admin910@school.com", "school_admin")
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    students = client.get("/api/v1/students", headers=admin_headers).json()
+    if not students:
+        client.post(
+            "/api/v1/students",
+            headers=admin_headers,
+            json={"admission_no": "ADM-910", "full_name": "Meera Nair", "class_name": "Grade 9", "section": "A"},
+        )
+        students = client.get("/api/v1/students", headers=admin_headers).json()
+
+    student_id = students[0]["id"]
+
+    invoice_resp = client.post(
+        "/api/v1/fees/invoices",
+        headers=admin_headers,
+        json={"student_id": student_id, "term": "Term 1", "amount_due": 50000, "status": "due"},
+    )
+    assert invoice_resp.status_code == 201
+    invoice_id = invoice_resp.json()["id"]
+
+    payment_resp = client.post(
+        "/api/v1/fees/payments",
+        headers=admin_headers,
+        json={
+            "invoice_id": invoice_id,
+            "amount_paid": 50000,
+            "payment_mode": "upi",
+            "transaction_ref": "UPI-TXN-910",
+        },
+    )
+    assert payment_resp.status_code == 201
+
+    invoices_resp = client.get("/api/v1/fees/invoices", headers=admin_headers)
+    assert invoices_resp.status_code == 200
+    assert len(invoices_resp.json()) >= 1
+
+    payments_resp = client.get("/api/v1/fees/payments", headers=admin_headers)
+    assert payments_resp.status_code == 200
+    assert len(payments_resp.json()) >= 1

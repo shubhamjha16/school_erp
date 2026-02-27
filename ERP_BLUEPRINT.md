@@ -299,5 +299,8 @@ If you want, the next iteration can include:
   - Exams APIs
   - Student marks APIs
   - Report card generation and listing APIs
-- Sprint 9+ (next):
-  - Fee module, parent portal
+- Sprint 9-10 (implemented):
+  - Fee invoice APIs
+  - Fee payment and status update APIs
+- Sprint 11+ (next):
+  - Parent portal
