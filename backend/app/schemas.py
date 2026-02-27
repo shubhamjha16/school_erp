@@ -16,6 +16,7 @@ class RegisterRequest(BaseModel):
     full_name: str
     password: str
     roles: list[str] = ["teacher"]
+    school_ids: list[int] = []
 
 
 class UserOut(BaseModel):
@@ -23,6 +24,7 @@ class UserOut(BaseModel):
     email: EmailStr
     full_name: str
     roles: list[str]
+    school_ids: list[int] = []
 
 
 class TenantCreate(BaseModel):

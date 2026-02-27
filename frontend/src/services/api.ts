@@ -1,11 +1,24 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').replace(/\/$/, '');
+
+function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
+    if (!headers) return {};
+    if (headers instanceof Headers) {
+        return Object.fromEntries(headers.entries());
+    }
+    if (Array.isArray(headers)) {
+        return Object.fromEntries(headers);
+    }
+    return headers;
+}
 
 export async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const token = localStorage.getItem('token');
+    const incomingHeaders = normalizeHeaders(options?.headers);
+    const isFormData = options?.body instanceof FormData;
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...(options?.headers as Record<string, string>),
+        ...incomingHeaders,
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -24,6 +37,11 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
         throw new Error(errorData.detail || errorData.message || 'API Request failed');
     }
 
+    const contentType = response.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+        return await response.json();
+    }
+
     const text = await response.text();
-    return text ? JSON.parse(text) : {} as T;
+    return (text ? ({ message: text } as T) : ({} as T));
 }

@@ -312,8 +312,10 @@ If you want, the next iteration can include:
   - Audit logs and readiness ops APIs
   - Additional hardening hooks
   - Dockerfile and CI compile workflow
-- Sprint 15+ (next):
-  - Multi-tenant data isolation enforcement and external integrations
+- Sprint 15+ (in progress):
+  - Multi-tenant data isolation foundation with user-school and student-school mapping
+  - School-scoped filtering for student, attendance, SIS, fees, parent portal, and dashboard APIs
+  - External integrations (next)
 
 ### Frontend Delivery Status (React + TypeScript + Vite)
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..deps import get_current_user, require_roles
+from ..deps import ensure_student_in_scope, get_current_user, require_roles
 from ..models import Exam, ReportCard, Student, StudentMark, User
 from ..schemas import (
     ExamCreate,
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/exams", tags=["exams"])
 def create_exam(
     payload: ExamCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("school_admin", "principal")),
+    user: User = Depends(require_roles("school_admin", "principal")),
 ):
     exam = Exam(**payload.model_dump())
     db.add(exam)
@@ -33,11 +33,13 @@ def create_exam(
 def add_mark(
     payload: StudentMarkCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("teacher", "school_admin", "principal")),
+    user: User = Depends(require_roles("teacher", "school_admin", "principal")),
 ):
     student = db.query(Student).filter(Student.id == payload.student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
+
+    ensure_student_in_scope(db, payload.student_id, user)
 
     exam = db.query(Exam).filter(Exam.id == payload.exam_id).first()
     if not exam:
@@ -64,11 +66,13 @@ def add_mark(
 def generate_report_card(
     payload: ReportCardCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("school_admin", "principal")),
+    user: User = Depends(require_roles("school_admin", "principal")),
 ):
     student = db.query(Student).filter(Student.id == payload.student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
+
+    ensure_student_in_scope(db, payload.student_id, user)
 
     exam = db.query(Exam).filter(Exam.id == payload.exam_id).first()
     if not exam:
@@ -122,8 +126,9 @@ def generate_report_card(
 def list_report_cards(
     student_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
+    ensure_student_in_scope(db, student_id, user)
     rows = db.query(ReportCard).filter(ReportCard.student_id == student_id).order_by(ReportCard.id.asc()).all()
     return [
         ReportCardOut(

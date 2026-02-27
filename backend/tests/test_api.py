@@ -6,16 +6,46 @@ from app.main import app
 client = TestClient(app)
 
 
-def create_user_and_login(email: str, role: str) -> str:
+def ensure_school() -> int:
+    root_email = "root-bootstrap@erp.com"
     client.post(
         "/api/v1/auth/register",
         json={
-            "email": email,
-            "full_name": f"{role} user",
+            "email": root_email,
+            "full_name": "Root Bootstrap",
             "password": "secret123",
-            "roles": [role],
+            "roles": ["super_admin"],
         },
     )
+    login = client.post("/api/v1/auth/login", json={"email": root_email, "password": "secret123"})
+    assert login.status_code == 200
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    client.post("/api/v1/onboarding/tenants", headers=headers, json={"name": "Bootstrap Tenant"})
+    tenants = client.get("/api/v1/onboarding/tenants", headers=headers).json()
+    tenant_id = tenants[0]["id"]
+
+    client.post(
+        "/api/v1/onboarding/schools",
+        headers=headers,
+        json={"tenant_id": tenant_id, "name": "Bootstrap School", "code": "BOOTSTRAP"},
+    )
+    schools = client.get("/api/v1/onboarding/schools", headers=headers).json()
+    return schools[0]["id"]
+
+
+def create_user_and_login(email: str, role: str, school_id: int | None = None) -> str:
+    payload = {
+        "email": email,
+        "full_name": f"{role} user",
+        "password": "secret123",
+        "roles": [role],
+    }
+    if role != "super_admin":
+        assert school_id is not None
+        payload["school_ids"] = [school_id]
+
+    client.post("/api/v1/auth/register", json=payload)
     login_response = client.post(
         "/api/v1/auth/login",
         json={"email": email, "password": "secret123"},
@@ -31,7 +61,8 @@ def test_health_check():
 
 
 def test_auth_and_student_flow():
-    token = create_user_and_login("admin@school.com", "school_admin")
+    school_id = ensure_school()
+    token = create_user_and_login("admin@school.com", "school_admin", school_id)
     headers = {"Authorization": f"Bearer {token}"}
 
     create_response = client.post(
@@ -76,7 +107,8 @@ def test_onboarding_tenant_and_school_flow():
 
 
 def test_onboarding_forbidden_for_non_super_admin():
-    teacher_token = create_user_and_login("teacher@school.com", "teacher")
+    school_id = ensure_school()
+    teacher_token = create_user_and_login("teacher@school.com", "teacher", school_id)
     headers = {"Authorization": f"Bearer {teacher_token}"}
 
     response = client.post("/api/v1/onboarding/tenants", headers=headers, json={"name": "No Access Org"})
@@ -84,19 +116,8 @@ def test_onboarding_forbidden_for_non_super_admin():
 
 
 def test_sprint_3_4_academic_and_sis_flow():
-    super_admin_token = create_user_and_login("super2@erp.com", "super_admin")
-    super_headers = {"Authorization": f"Bearer {super_admin_token}"}
-
-    client.post("/api/v1/onboarding/tenants", headers=super_headers, json={"name": "Group Two"})
-    tenant_id = client.get("/api/v1/onboarding/tenants", headers=super_headers).json()[0]["id"]
-    client.post(
-        "/api/v1/onboarding/schools",
-        headers=super_headers,
-        json={"tenant_id": tenant_id, "name": "Blue Valley School", "code": "BVS001"},
-    )
-    school_id = client.get("/api/v1/onboarding/schools", headers=super_headers).json()[0]["id"]
-
-    admin_token = create_user_and_login("admin2@school.com", "school_admin")
+    school_id = ensure_school()
+    admin_token = create_user_and_login("admin2@school.com", "school_admin", school_id)
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
 
     year_resp = client.post("/api/v1/academic/years", headers=admin_headers, json={"school_id": school_id, "name": "2025-26"})
@@ -138,13 +159,13 @@ def test_sprint_3_4_academic_and_sis_flow():
 
 
 def test_sprint_5_6_attendance_notifications_and_dashboard():
-    admin_token = create_user_and_login("admin56@school.com", "school_admin")
-    teacher_token = create_user_and_login("teacher56@school.com", "teacher")
+    school_id = ensure_school()
+    admin_token = create_user_and_login("admin56@school.com", "school_admin", school_id)
+    teacher_token = create_user_and_login("teacher56@school.com", "teacher", school_id)
 
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
     teacher_headers = {"Authorization": f"Bearer {teacher_token}"}
 
-    # ensure at least one student exists
     students = client.get("/api/v1/students", headers=admin_headers).json()
     if not students:
         client.post(
@@ -192,8 +213,9 @@ def test_sprint_5_6_attendance_notifications_and_dashboard():
 
 
 def test_sprint_7_8_exams_marks_report_cards():
-    admin_token = create_user_and_login("admin78@school.com", "school_admin")
-    teacher_token = create_user_and_login("teacher78@school.com", "teacher")
+    school_id = ensure_school()
+    admin_token = create_user_and_login("admin78@school.com", "school_admin", school_id)
+    teacher_token = create_user_and_login("teacher78@school.com", "teacher", school_id)
 
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
     teacher_headers = {"Authorization": f"Bearer {teacher_token}"}
@@ -244,7 +266,8 @@ def test_sprint_7_8_exams_marks_report_cards():
 
 
 def test_sprint_9_10_fee_invoices_and_payments():
-    admin_token = create_user_and_login("admin910@school.com", "school_admin")
+    school_id = ensure_school()
+    admin_token = create_user_and_login("admin910@school.com", "school_admin", school_id)
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
 
     students = client.get("/api/v1/students", headers=admin_headers).json()
@@ -288,8 +311,9 @@ def test_sprint_9_10_fee_invoices_and_payments():
 
 
 def test_sprint_11_12_parent_portal_and_hardening():
-    admin_token = create_user_and_login("admin1112@school.com", "school_admin")
-    parent_token = create_user_and_login("parent1112@school.com", "parent")
+    school_id = ensure_school()
+    admin_token = create_user_and_login("admin1112@school.com", "school_admin", school_id)
+    parent_token = create_user_and_login("parent1112@school.com", "parent", school_id)
 
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
     parent_headers = {"Authorization": f"Bearer {parent_token}"}
@@ -319,7 +343,6 @@ def test_sprint_11_12_parent_portal_and_hardening():
     )
     assert map_resp.status_code == 201
 
-    # hardening check: invalid marks should fail
     exam_resp = client.post(
         "/api/v1/exams",
         headers=admin_headers,
@@ -335,7 +358,6 @@ def test_sprint_11_12_parent_portal_and_hardening():
     )
     assert bad_mark.status_code == 400
 
-    # hardening check: invalid payment mode should fail
     invoice_resp = client.post(
         "/api/v1/fees/invoices",
         headers=admin_headers,
@@ -350,7 +372,6 @@ def test_sprint_11_12_parent_portal_and_hardening():
     )
     assert bad_payment.status_code == 400
 
-    # parent portal endpoints
     student_list_resp = client.get(f"/api/v1/parent/students/{guardian_id}", headers=parent_headers)
     assert student_list_resp.status_code == 200
     assert len(student_list_resp.json()) >= 1
@@ -362,7 +383,8 @@ def test_sprint_11_12_parent_portal_and_hardening():
 
 
 def test_sprint_13_14_async_notifications_ops_and_audit():
-    admin_token = create_user_and_login("admin1314@school.com", "school_admin")
+    school_id = ensure_school()
+    admin_token = create_user_and_login("admin1314@school.com", "school_admin", school_id)
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
 
     notif_resp = client.post(
