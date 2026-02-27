@@ -359,3 +359,31 @@ def test_sprint_11_12_parent_portal_and_hardening():
     assert dashboard_resp.status_code == 200
     body = dashboard_resp.json()
     assert body["total_students"] >= 1
+
+
+def test_sprint_13_14_async_notifications_ops_and_audit():
+    admin_token = create_user_and_login("admin1314@school.com", "school_admin")
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    notif_resp = client.post(
+        "/api/v1/notifications",
+        headers=admin_headers,
+        json={"audience": "parents", "channel": "email", "title": "PTM", "message": "PTM on Saturday"},
+    )
+    assert notif_resp.status_code == 201
+    notif_id = notif_resp.json()["id"]
+
+    queue_resp = client.post("/api/v1/notifications/queue", headers=admin_headers, json={"notification_id": notif_id})
+    assert queue_resp.status_code == 201
+
+    queue_list = client.get("/api/v1/notifications/queue", headers=admin_headers)
+    assert queue_list.status_code == 200
+    assert len(queue_list.json()) >= 1
+
+    readiness = client.get("/api/v1/ops/readiness")
+    assert readiness.status_code == 200
+    assert readiness.json()["status"] == "ready"
+
+    audit = client.get("/api/v1/ops/audit-logs", headers=admin_headers)
+    assert audit.status_code == 200
+    assert isinstance(audit.json(), list)

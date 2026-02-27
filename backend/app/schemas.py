@@ -207,3 +207,20 @@ class ParentDashboardOut(BaseModel):
     report_cards: int
     fee_invoices: int
     fee_due_count: int
+
+
+class NotificationDispatchCreate(BaseModel):
+    notification_id: int
+
+
+class NotificationDispatchOut(NotificationDispatchCreate):
+    id: int
+    status: str
+
+
+class AuditLogOut(BaseModel):
+    id: int
+    actor: str
+    action: str
+    entity: str
+    detail: str

@@ -307,5 +307,10 @@ If you want, the next iteration can include:
   - Parent portal dashboard metrics API
   - Hardening validations for marks and payment mode
   - UAT checklist added
-- Sprint 13+ (next):
-  - Production hardening, async notifications, and deployment automation
+- Sprint 13-14 (implemented):
+  - Async notification queue APIs
+  - Audit logs and readiness ops APIs
+  - Additional hardening hooks
+  - Dockerfile and CI compile workflow
+- Sprint 15+ (next):
+  - Multi-tenant data isolation enforcement and external integrations

@@ -175,3 +175,21 @@ class FeePayment(Base):
     amount_paid: Mapped[int] = mapped_column(Integer, nullable=False)
     payment_mode: Mapped[str] = mapped_column(String(20), nullable=False)  # cash/card/upi/bank
     transaction_ref: Mapped[str] = mapped_column(String(100), nullable=False)
+
+
+class NotificationDispatch(Base):
+    __tablename__ = "notification_dispatches"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    notification_id: Mapped[int] = mapped_column(ForeignKey("notifications.id"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="queued")
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    actor: Mapped[str] = mapped_column(String(100), nullable=False)
+    action: Mapped[str] = mapped_column(String(100), nullable=False)
+    entity: Mapped[str] = mapped_column(String(100), nullable=False)
+    detail: Mapped[str] = mapped_column(String(1000), nullable=False)

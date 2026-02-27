@@ -16,3 +16,10 @@
 - [ ] Attendance mark/list
 - [ ] Exams + report cards
 - [ ] Fee invoice/payment
+
+## Sprint 13-14 Ops/Deployment
+- [ ] Notification queue can be enqueued and observed
+- [ ] Readiness endpoint reports `ready`
+- [ ] Audit logs visible to admin roles
+- [ ] Docker build succeeds locally
+- [ ] CI compile workflow passes
