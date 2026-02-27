@@ -1,37 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Table } from '../../components/ui/Table';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { fetchApi } from '../../services/api';
+import type { SchoolClassOut } from '../../types';
 import './Academics.css';
 
-// Mock Data
+// Fallback mock data
 const mockYears = [
-    { id: '1', name: '2025-2026', startDate: '2025-04-01', endDate: '2026-03-31', status: 'Active' },
-    { id: '2', name: '2024-2025', startDate: '2024-04-01', endDate: '2025-03-31', status: 'Completed' },
+    { id: 1, school_id: 1, name: '2025-2026' },
+    { id: 2, school_id: 1, name: '2024-2025' },
 ];
-
 const mockClasses = [
-    { id: '1', name: 'Class X', sections: 'A, B, C', stream: 'General' },
-    { id: '2', name: 'Class XI', sections: 'A (Science), B (Commerce)', stream: 'Mixed' },
+    { id: 1, school_id: 1, name: 'Class X' },
+    { id: 2, school_id: 1, name: 'Class XI' },
 ];
 
 export const Academics = () => {
     const [activeTab, setActiveTab] = useState<'years' | 'classes'>('years');
+    const [years, setYears] = useState<any[]>([]);
+    const [classes, setClasses] = useState<SchoolClassOut[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            try {
+                const cls = await fetchApi<SchoolClassOut[]>('/academic/classes');
+                setClasses(cls);
+                setYears(mockYears); // No list endpoint for years yet
+            } catch {
+                setYears(mockYears);
+                setClasses(mockClasses);
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, []);
 
     const yearColumns = [
+        { header: 'ID', accessorKey: 'id' },
         { header: 'Academic Year', accessorKey: 'name' },
-        { header: 'Start Date', accessorKey: 'startDate' },
-        { header: 'End Date', accessorKey: 'endDate' },
-        {
-            header: 'Status',
-            accessorKey: 'status',
-            cell: (item: any) => (
-                <span className={`academic-badge ${item.status.toLowerCase()}`}>
-                    {item.status}
-                </span>
-            )
-        },
+        { header: 'School ID', accessorKey: 'school_id' },
         {
             header: 'Actions',
             accessorKey: 'id',
@@ -40,9 +52,9 @@ export const Academics = () => {
     ];
 
     const classColumns = [
+        { header: 'ID', accessorKey: 'id' },
         { header: 'Class Name', accessorKey: 'name' },
-        { header: 'Sections', accessorKey: 'sections' },
-        { header: 'Stream/Group', accessorKey: 'stream' },
+        { header: 'School ID', accessorKey: 'school_id' },
         {
             header: 'Actions',
             accessorKey: 'id',
@@ -63,31 +75,25 @@ export const Academics = () => {
             />
 
             <div className="tabs">
-                <button
-                    className={`tab-btn ${activeTab === 'years' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('years')}
-                >
-                    Academic Years
+                <button className={`tab-btn ${activeTab === 'years' ? 'active' : ''}`} onClick={() => setActiveTab('years')}>
+                    Academic Years ({years.length})
                 </button>
-                <button
-                    className={`tab-btn ${activeTab === 'classes' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('classes')}
-                >
-                    Classes & Sections
+                <button className={`tab-btn ${activeTab === 'classes' ? 'active' : ''}`} onClick={() => setActiveTab('classes')}>
+                    Classes ({classes.length})
                 </button>
             </div>
 
             <Card className="mt-4">
                 <CardHeader>
-                    <CardTitle>
-                        {activeTab === 'years' ? 'Academic Sessions' : 'Class Configurations'}
-                    </CardTitle>
+                    <CardTitle>{activeTab === 'years' ? 'Academic Sessions' : 'Class Configurations'}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {activeTab === 'years' ? (
-                        <Table data={mockYears} columns={yearColumns} />
+                    {loading ? (
+                        <div className="p-8 text-center text-secondary">Loading...</div>
+                    ) : activeTab === 'years' ? (
+                        <Table data={years} columns={yearColumns} />
                     ) : (
-                        <Table data={mockClasses} columns={classColumns} />
+                        <Table data={classes} columns={classColumns} />
                     )}
                 </CardContent>
             </Card>

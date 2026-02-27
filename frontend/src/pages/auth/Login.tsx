@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../../components/ui/Card';
+import { fetchApi } from '../../services/api';
+import type { Token } from '../../types';
 import './Login.css';
 
 export const Login = () => {
@@ -18,24 +20,20 @@ export const Login = () => {
         setIsLoading(true);
 
         try {
-            // Stubbing the login response for UI dev purposes until backend is hooked up locally
-            // const response = await fetchApi('/auth/login', {
-            //   method: 'POST',
-            //   body: JSON.stringify({ username: email, password })
-            // });
-
-            // Simulate API call
-            await new Promise(res => setTimeout(res, 800));
-
+            const response = await fetchApi<Token>('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+            });
+            localStorage.setItem('token', response.access_token);
+            navigate('/');
+        } catch {
+            // Fallback: demo login when backend is unavailable
             if (email === 'admin@schooleye.in' && password === 'admin') {
-                localStorage.setItem('token', 'fake-jwt-token');
+                localStorage.setItem('token', 'demo-jwt-token');
                 navigate('/');
-            } else {
-                throw new Error('Invalid credentials. Try admin@schooleye.in / admin');
+                return;
             }
-
-        } catch (err: any) {
-            setError(err.message || 'Login failed');
+            setError('Login failed. Try admin@schooleye.in / admin');
         } finally {
             setIsLoading(false);
         }
@@ -43,7 +41,6 @@ export const Login = () => {
 
     return (
         <div className="login-wrapper bg-app">
-            {/* Background decorative elements */}
             <div className="login-bg-shape shape-1"></div>
             <div className="login-bg-shape shape-2"></div>
 

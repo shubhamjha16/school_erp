@@ -1,29 +1,45 @@
+import { useState, useEffect } from 'react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Table } from '../../components/ui/Table';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { fetchApi } from '../../services/api';
+import type { ExamOut } from '../../types';
 import './Exams.css';
 
-// Mock Data
-const mockExams = [
-    { id: '1', name: 'Mid-Term Examination', term: 'Term 1', startDate: '2025-09-15', status: 'Upcoming' },
-    { id: '2', name: 'Unit Test 1', term: 'Term 1', startDate: '2025-07-20', status: 'Completed' },
+const mockExams: ExamOut[] = [
+    { id: 1, name: 'Mid-Term Examination', academic_year: '2025-2026' },
+    { id: 2, name: 'Unit Test 1', academic_year: '2025-2026' },
 ];
 
 export const Exams = () => {
+    const [exams, setExams] = useState<ExamOut[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // No list endpoint exists yet, use mock
+        setExams(mockExams);
+        setLoading(false);
+    }, []);
+
+    const handleCreateExam = async () => {
+        const name = prompt('Exam name:');
+        if (!name) return;
+        try {
+            const newExam = await fetchApi<ExamOut>('/exams', {
+                method: 'POST',
+                body: JSON.stringify({ name, academic_year: '2025-2026' }),
+            });
+            setExams(prev => [newExam, ...prev]);
+        } catch {
+            alert('Failed to create. Backend may be offline.');
+        }
+    };
+
     const examColumns = [
+        { header: 'ID', accessorKey: 'id' },
         { header: 'Exam Name', accessorKey: 'name' },
-        { header: 'Term/Session', accessorKey: 'term' },
-        { header: 'Start Date', accessorKey: 'startDate' },
-        {
-            header: 'Status',
-            accessorKey: 'status',
-            cell: (item: any) => (
-                <span className={`exam-status ${item.status.toLowerCase()}`}>
-                    {item.status}
-                </span>
-            )
-        },
+        { header: 'Academic Year', accessorKey: 'academic_year' },
         {
             header: 'Actions',
             accessorKey: 'id',
@@ -41,17 +57,17 @@ export const Exams = () => {
             <PageHeader
                 title="Examination Management"
                 description="Configure exam schedules and manage student marks entry."
-                actions={
-                    <Button>+ Create Exam</Button>
-                }
+                actions={<Button onClick={handleCreateExam}>+ Create Exam</Button>}
             />
 
             <Card>
-                <CardHeader>
-                    <CardTitle>Exam Configurations</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Exam Configurations</CardTitle></CardHeader>
                 <CardContent>
-                    <Table data={mockExams} columns={examColumns} />
+                    {loading ? (
+                        <div className="p-8 text-center text-secondary">Loading...</div>
+                    ) : (
+                        <Table data={exams} columns={examColumns} />
+                    )}
                 </CardContent>
             </Card>
 
@@ -63,8 +79,7 @@ export const Exams = () => {
                             <div>
                                 <label className="text-sm font-medium mb-1 block">Select Exam</label>
                                 <select className="w-full input-field">
-                                    <option>Mid-Term Examination</option>
-                                    <option>Unit Test 1</option>
+                                    {exams.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
                                 </select>
                             </div>
                             <div className="flex gap-4">

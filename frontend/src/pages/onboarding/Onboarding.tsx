@@ -1,32 +1,71 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Table } from '../../components/ui/Table';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { fetchApi } from '../../services/api';
+import type { TenantOut, SchoolOut } from '../../types';
 import './Onboarding.css';
 
-// Mock Data
+// Fallback mock data
 const mockTenants = [
-    { id: '1', name: 'Global Education Trust', adminEmail: 'admin@globaledu.com', status: 'Active', schools: 5 },
-    { id: '2', name: 'Sunrise Learning Society', adminEmail: 'ops@sunrise.org', status: 'Pending', schools: 1 },
+    { id: 1, name: 'Global Education Trust' },
+    { id: 2, name: 'Sunrise Learning Society' },
+];
+const mockSchools: SchoolOut[] = [
+    { id: 1, tenant_id: 1, name: 'SchoolEye Academy - Main Branch', code: 'SE-001' },
 ];
 
 export const Onboarding = () => {
     const [activeTab, setActiveTab] = useState<'tenants' | 'schools'>('tenants');
+    const [tenants, setTenants] = useState<TenantOut[]>([]);
+    const [schools, setSchools] = useState<SchoolOut[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            try {
+                const [t, s] = await Promise.all([
+                    fetchApi<TenantOut[]>('/onboarding/tenants'),
+                    fetchApi<SchoolOut[]>('/onboarding/schools'),
+                ]);
+                setTenants(t);
+                setSchools(s);
+            } catch {
+                setTenants(mockTenants);
+                setSchools(mockSchools);
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, []);
 
     const tenantColumns = [
+        { header: 'ID', accessorKey: 'id' },
         { header: 'Tenant Name', accessorKey: 'name' },
-        { header: 'Admin Email', accessorKey: 'adminEmail' },
         {
-            header: 'Status',
-            accessorKey: 'status',
-            cell: (item: any) => (
-                <span className={`status-badge ${item.status.toLowerCase()}`}>
-                    {item.status}
-                </span>
-            )
+            header: 'Schools',
+            accessorKey: 'id',
+            cell: (item: TenantOut) => <span>{schools.filter(s => s.tenant_id === item.id).length}</span>
         },
-        { header: 'Schools #', accessorKey: 'schools' },
+        {
+            header: 'Actions',
+            accessorKey: 'id',
+            cell: () => <Button variant="ghost" size="sm">Edit</Button>
+        },
+    ];
+
+    const schoolColumns = [
+        { header: 'ID', accessorKey: 'id' },
+        { header: 'School Name', accessorKey: 'name' },
+        { header: 'Code', accessorKey: 'code' },
+        {
+            header: 'Tenant',
+            accessorKey: 'tenant_id',
+            cell: (item: SchoolOut) => <span>{tenants.find(t => t.id === item.tenant_id)?.name || `Tenant #${item.tenant_id}`}</span>
+        },
         {
             header: 'Actions',
             accessorKey: 'id',
@@ -51,13 +90,13 @@ export const Onboarding = () => {
                     className={`tab-btn ${activeTab === 'tenants' ? 'active' : ''}`}
                     onClick={() => setActiveTab('tenants')}
                 >
-                    Tenants (Organizations)
+                    Tenants ({tenants.length})
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'schools' ? 'active' : ''}`}
                     onClick={() => setActiveTab('schools')}
                 >
-                    School Branches
+                    School Branches ({schools.length})
                 </button>
             </div>
 
@@ -68,13 +107,12 @@ export const Onboarding = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {activeTab === 'tenants' ? (
-                        <Table data={mockTenants} columns={tenantColumns} />
+                    {loading ? (
+                        <div className="p-8 text-center text-secondary">Loading...</div>
+                    ) : activeTab === 'tenants' ? (
+                        <Table data={tenants} columns={tenantColumns} />
                     ) : (
-                        <div className="p-8 text-center text-secondary empty-state border border-dashed border-color rounded-md">
-                            <p>Select a Tenant to view their schools or create a new School.</p>
-                            <Button variant="secondary" className="mt-4">Setup First School</Button>
-                        </div>
+                        <Table data={schools} columns={schoolColumns} />
                     )}
                 </CardContent>
             </Card>

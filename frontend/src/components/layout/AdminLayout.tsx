@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
     Building2, Users, BookOpen, Calendar, GraduationCap, CreditCard,
     LogOut, Menu, X, Bell, Sun, Moon, FileText, Shield, Activity
 } from 'lucide-react';
+import { fetchApi } from '../../services/api';
+import type { UserOut } from '../../types';
 import './AdminLayout.css';
 
 const navItems = [
@@ -25,7 +27,24 @@ const navItems = [
 export const AdminLayout = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [user, setUser] = useState<UserOut | null>(null);
     const navigate = useNavigate();
+
+    // Route guard: redirect to login if no token
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+        // Try to fetch user info
+        fetchApi<UserOut>('/auth/me')
+            .then(setUser)
+            .catch(() => {
+                // If /auth/me fails (demo token), use fallback
+                setUser({ id: 0, email: 'admin@schooleye.in', full_name: 'Admin', roles: ['super_admin'] });
+            });
+    }, [navigate]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -40,12 +59,10 @@ export const AdminLayout = () => {
 
     return (
         <div className="admin-layout">
-            {/* Mobile overlay */}
             {isSidebarOpen && (
                 <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
             )}
 
-            {/* Sidebar */}
             <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
                     <div className="logo flex items-center gap-2">
@@ -82,7 +99,6 @@ export const AdminLayout = () => {
                 </div>
             </aside>
 
-            {/* Main Content */}
             <div className="main-wrapper">
                 <header className="topbar">
                     <div className="flex items-center gap-4">
@@ -100,8 +116,8 @@ export const AdminLayout = () => {
                             <Bell size={20} />
                             <span className="badge">3</span>
                         </button>
-                        <div className="user-profile">
-                            <div className="avatar">A</div>
+                        <div className="user-profile" title={user?.full_name || 'Admin'}>
+                            <div className="avatar">{user?.full_name?.[0] || 'A'}</div>
                         </div>
                     </div>
                 </header>

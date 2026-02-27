@@ -1,54 +1,62 @@
+import { useState, useEffect } from 'react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Table } from '../../components/ui/Table';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { fetchApi } from '../../services/api';
+import type { GuardianOut } from '../../types';
 import './Guardians.css';
 
-// Mock Data
-const mockGuardians = [
-    { id: '1', name: 'Rajesh Sharma', relation: 'Father', phone: '+91 9876543210', email: 'rajesh@example.com', students: 2 },
-    { id: '2', name: 'Anita Desai', relation: 'Mother', phone: '+91 9123456780', email: 'anita.d@example.com', students: 1 },
+const mockGuardians: GuardianOut[] = [
+    { id: 1, full_name: 'Rajesh Sharma', phone: '+91-9876543210', relation: 'Father' },
+    { id: 2, full_name: 'Priya Desai', phone: '+91-9123456789', relation: 'Mother' },
 ];
 
 export const Guardians = () => {
+    const [guardians, setGuardians] = useState<GuardianOut[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const guardianColumns = [
-        { header: 'Guardian Name', accessorKey: 'name' },
+    useEffect(() => {
+        fetchApi<GuardianOut[]>('/sis/guardians')
+            .then(setGuardians)
+            .catch(() => setGuardians(mockGuardians))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const columns = [
+        { header: 'ID', accessorKey: 'id' },
+        { header: 'Full Name', accessorKey: 'full_name' },
+        { header: 'Phone', accessorKey: 'phone' },
         { header: 'Relation', accessorKey: 'relation' },
-        { header: 'Contact No.', accessorKey: 'phone' },
-        { header: 'Email ID', accessorKey: 'email' },
-        {
-            header: 'Linked Students',
-            accessorKey: 'students',
-            cell: (item: any) => (
-                <span className="student-count-badge">
-                    {item.students} {item.students === 1 ? 'Child' : 'Children'}
-                </span>
-            )
-        },
         {
             header: 'Actions',
             accessorKey: 'id',
-            cell: () => <Button variant="ghost" size="sm">View Profile</Button>
+            cell: () => (
+                <div className="flex gap-2">
+                    <Button variant="ghost" size="sm">View</Button>
+                    <Button variant="ghost" size="sm">Link Student</Button>
+                </div>
+            )
         },
     ];
 
     return (
         <div className="guardians-page animate-fade-in">
             <PageHeader
-                title="Guardian Profiles"
-                description="Manage parent and guardian profiles and contact information."
-                actions={
-                    <Button>+ Register Guardian</Button>
-                }
+                title="Guardian Management"
+                description="Manage parent and guardian profiles and student relationships."
+                actions={<Button>+ Add Guardian</Button>}
             />
-
             <Card>
                 <CardHeader>
-                    <CardTitle>Registered Guardians</CardTitle>
+                    <CardTitle>All Guardians ({guardians.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table data={mockGuardians} columns={guardianColumns} />
+                    {loading ? (
+                        <div className="p-8 text-center text-secondary">Loading...</div>
+                    ) : (
+                        <Table data={guardians} columns={columns} />
+                    )}
                 </CardContent>
             </Card>
         </div>
