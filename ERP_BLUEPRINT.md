@@ -277,3 +277,4 @@ If you want, the next iteration can include:
 - a complete folder structure,
 - starter schema migrations,
 - and scaffolded APIs for Auth, SIS, Attendance, Exams, and Fees.
+
