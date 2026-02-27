@@ -277,3 +277,16 @@ If you want, the next iteration can include:
 - a complete folder structure,
 - starter schema migrations,
 - and scaffolded APIs for Auth, SIS, Attendance, Exams, and Fees.
+
+
+## 13) Delivery Status (Implemented Incrementally)
+
+- Sprint 1-2 (implemented):
+  - Backend scaffold with FastAPI
+  - Auth (register/login/me)
+  - RBAC guard utilities
+  - Tenant onboarding APIs
+  - School onboarding APIs
+  - Student create/list starter APIs
+- Sprint 3+ (next):
+  - Academic setup, attendance, exams, fee module, parent portal

@@ -11,6 +11,26 @@ class UserRole(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), primary_key=True)
 
 
+class Tenant(Base):
+    __tablename__ = "tenants"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+
+    schools: Mapped[list["School"]] = relationship("School", back_populates="tenant", cascade="all, delete-orphan")
+
+
+class School(Base):
+    __tablename__ = "schools"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    tenant_id: Mapped[int] = mapped_column(ForeignKey("tenants.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    code: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
+
+    tenant: Mapped[Tenant] = relationship("Tenant", back_populates="schools")
+
+
 class Role(Base):
     __tablename__ = "roles"
 

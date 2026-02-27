@@ -25,6 +25,24 @@ class UserOut(BaseModel):
     roles: list[str]
 
 
+class TenantCreate(BaseModel):
+    name: str
+
+
+class TenantOut(TenantCreate):
+    id: int
+
+
+class SchoolCreate(BaseModel):
+    tenant_id: int
+    name: str
+    code: str
+
+
+class SchoolOut(SchoolCreate):
+    id: int
+
+
 class StudentCreate(BaseModel):
     admission_no: str
     full_name: str
