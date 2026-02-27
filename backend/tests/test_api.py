@@ -1,0 +1,149 @@
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+
+client = TestClient(app)
+
+
+def create_user_and_login(email: str, role: str) -> str:
+    client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "full_name": f"{role} user",
+            "password": "secret123",
+            "roles": [role],
+        },
+    )
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": "secret123"},
+    )
+    assert login_response.status_code == 200
+    return login_response.json()["access_token"]
+
+
+def test_health_check():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
+def test_auth_and_student_flow():
+    token = create_user_and_login("admin@school.com", "school_admin")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    create_response = client.post(
+        "/api/v1/students",
+        headers=headers,
+        json={
+            "admission_no": "ADM-001",
+            "full_name": "Student One",
+            "class_name": "5",
+            "section": "A",
+        },
+    )
+    assert create_response.status_code in (201, 400)
+
+    list_response = client.get("/api/v1/students", headers=headers)
+    assert list_response.status_code == 200
+    assert isinstance(list_response.json(), list)
+
+
+def test_onboarding_tenant_and_school_flow():
+    super_admin_token = create_user_and_login("root@erp.com", "super_admin")
+    headers = {"Authorization": f"Bearer {super_admin_token}"}
+
+    tenant_response = client.post("/api/v1/onboarding/tenants", headers=headers, json={"name": "Edu Group"})
+    assert tenant_response.status_code in (201, 400)
+
+    tenant_list = client.get("/api/v1/onboarding/tenants", headers=headers)
+    assert tenant_list.status_code == 200
+    assert len(tenant_list.json()) >= 1
+
+    tenant_id = tenant_list.json()[0]["id"]
+    school_response = client.post(
+        "/api/v1/onboarding/schools",
+        headers=headers,
+        json={"tenant_id": tenant_id, "name": "Sunrise Public School", "code": "SPS001"},
+    )
+    assert school_response.status_code in (201, 400)
+
+    school_list = client.get("/api/v1/onboarding/schools", headers=headers)
+    assert school_list.status_code == 200
+    assert len(school_list.json()) >= 1
+
+
+def test_onboarding_forbidden_for_non_super_admin():
+    teacher_token = create_user_and_login("teacher@school.com", "teacher")
+    headers = {"Authorization": f"Bearer {teacher_token}"}
+
+    response = client.post("/api/v1/onboarding/tenants", headers=headers, json={"name": "No Access Org"})
+    assert response.status_code == 403
+
+
+def test_sprint_3_4_academic_and_sis_flow():
+    super_admin_token = create_user_and_login("super2@erp.com", "super_admin")
+    super_headers = {"Authorization": f"Bearer {super_admin_token}"}
+
+    # onboarding baseline
+    client.post("/api/v1/onboarding/tenants", headers=super_headers, json={"name": "Group Two"})
+    tenant_id = client.get("/api/v1/onboarding/tenants", headers=super_headers).json()[0]["id"]
+    client.post(
+        "/api/v1/onboarding/schools",
+        headers=super_headers,
+        json={"tenant_id": tenant_id, "name": "Blue Valley School", "code": "BVS001"},
+    )
+    school_id = client.get("/api/v1/onboarding/schools", headers=super_headers).json()[0]["id"]
+
+    # school admin flow
+    admin_token = create_user_and_login("admin2@school.com", "school_admin")
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    year_resp = client.post("/api/v1/academic/years", headers=admin_headers, json={"school_id": school_id, "name": "2025-26"})
+    assert year_resp.status_code == 201
+
+    class_resp = client.post("/api/v1/academic/classes", headers=admin_headers, json={"school_id": school_id, "name": "Grade 5"})
+    assert class_resp.status_code == 201
+    class_id = class_resp.json()["id"]
+
+    section_resp = client.post("/api/v1/academic/sections", headers=admin_headers, json={"class_id": class_id, "name": "A"})
+    assert section_resp.status_code == 201
+
+    subject_resp = client.post("/api/v1/academic/subjects", headers=admin_headers, json={"class_id": class_id, "name": "Mathematics"})
+    assert subject_resp.status_code == 201
+
+    class_list_resp = client.get("/api/v1/academic/classes", headers=admin_headers)
+    assert class_list_resp.status_code == 200
+    assert len(class_list_resp.json()) >= 1
+
+    student_resp = client.post(
+        "/api/v1/students",
+        headers=admin_headers,
+        json={"admission_no": "ADM-302", "full_name": "Riya Sharma", "class_name": "Grade 5", "section": "A"},
+    )
+    assert student_resp.status_code in (201, 400)
+
+    students = client.get("/api/v1/students", headers=admin_headers).json()
+    assert len(students) >= 1
+    student_id = students[0]["id"]
+
+    guardian_resp = client.post(
+        "/api/v1/sis/guardians",
+        headers=admin_headers,
+        json={"full_name": "Neha Sharma", "phone": "9999999999", "relation": "mother"},
+    )
+    assert guardian_resp.status_code == 201
+    guardian_id = guardian_resp.json()["id"]
+
+    map_resp = client.post(
+        "/api/v1/sis/student-guardians",
+        headers=admin_headers,
+        json={"student_id": student_id, "guardian_id": guardian_id},
+    )
+    assert map_resp.status_code == 201
+
+    linked_resp = client.get(f"/api/v1/sis/students/{student_id}/guardians", headers=admin_headers)
+    assert linked_resp.status_code == 200
+    assert len(linked_resp.json()) >= 1
