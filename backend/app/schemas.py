@@ -107,3 +107,32 @@ class StudentGuardianMapCreate(BaseModel):
 
 class StudentGuardianMapOut(StudentGuardianMapCreate):
     pass
+
+
+class AttendanceCreate(BaseModel):
+    student_id: int
+    date: str
+    status: str
+
+
+class AttendanceOut(AttendanceCreate):
+    id: int
+
+
+class NotificationCreate(BaseModel):
+    audience: str
+    channel: str
+    title: str
+    message: str
+
+
+class NotificationOut(NotificationCreate):
+    id: int
+
+
+class DashboardMetricsOut(BaseModel):
+    total_students: int
+    total_guardians: int
+    total_classes: int
+    attendance_marked: int
+    notifications_sent: int

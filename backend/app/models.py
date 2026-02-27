@@ -106,3 +106,22 @@ class StudentGuardian(Base):
 
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), primary_key=True)
     guardian_id: Mapped[int] = mapped_column(ForeignKey("guardians.id"), primary_key=True)
+
+
+class StudentAttendance(Base):
+    __tablename__ = "student_attendance"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    date: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False)  # present/absent/late
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    audience: Mapped[str] = mapped_column(String(30), nullable=False)  # all/parents/students/staff
+    channel: Mapped[str] = mapped_column(String(20), nullable=False)  # sms/email/in_app
+    title: Mapped[str] = mapped_column(String(150), nullable=False)
+    message: Mapped[str] = mapped_column(String(1000), nullable=False)

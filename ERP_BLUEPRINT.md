@@ -291,5 +291,9 @@ If you want, the next iteration can include:
 - Sprint 3-4 (implemented):
   - Academic setup APIs (academic years, classes, sections, subjects)
   - SIS guardian profiles and student-guardian mapping APIs
-- Sprint 5+ (next):
-  - Attendance, exams, fee module, parent portal
+- Sprint 5-6 (implemented):
+  - Student attendance APIs
+  - Notification center APIs
+  - Basic dashboard metrics API
+- Sprint 7+ (next):
+  - Exams, fee module, parent portal

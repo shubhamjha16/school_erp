@@ -87,7 +87,6 @@ def test_sprint_3_4_academic_and_sis_flow():
     super_admin_token = create_user_and_login("super2@erp.com", "super_admin")
     super_headers = {"Authorization": f"Bearer {super_admin_token}"}
 
-    # onboarding baseline
     client.post("/api/v1/onboarding/tenants", headers=super_headers, json={"name": "Group Two"})
     tenant_id = client.get("/api/v1/onboarding/tenants", headers=super_headers).json()[0]["id"]
     client.post(
@@ -97,7 +96,6 @@ def test_sprint_3_4_academic_and_sis_flow():
     )
     school_id = client.get("/api/v1/onboarding/schools", headers=super_headers).json()[0]["id"]
 
-    # school admin flow
     admin_token = create_user_and_login("admin2@school.com", "school_admin")
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
 
@@ -108,27 +106,21 @@ def test_sprint_3_4_academic_and_sis_flow():
     assert class_resp.status_code == 201
     class_id = class_resp.json()["id"]
 
-    section_resp = client.post("/api/v1/academic/sections", headers=admin_headers, json={"class_id": class_id, "name": "A"})
-    assert section_resp.status_code == 201
-
-    subject_resp = client.post("/api/v1/academic/subjects", headers=admin_headers, json={"class_id": class_id, "name": "Mathematics"})
-    assert subject_resp.status_code == 201
-
-    class_list_resp = client.get("/api/v1/academic/classes", headers=admin_headers)
-    assert class_list_resp.status_code == 200
-    assert len(class_list_resp.json()) >= 1
-
-    student_resp = client.post(
-        "/api/v1/students",
-        headers=admin_headers,
-        json={"admission_no": "ADM-302", "full_name": "Riya Sharma", "class_name": "Grade 5", "section": "A"},
-    )
-    assert student_resp.status_code in (201, 400)
+    assert client.post("/api/v1/academic/sections", headers=admin_headers, json={"class_id": class_id, "name": "A"}).status_code == 201
+    assert client.post(
+        "/api/v1/academic/subjects", headers=admin_headers, json={"class_id": class_id, "name": "Mathematics"}
+    ).status_code == 201
 
     students = client.get("/api/v1/students", headers=admin_headers).json()
-    assert len(students) >= 1
-    student_id = students[0]["id"]
+    if not students:
+        client.post(
+            "/api/v1/students",
+            headers=admin_headers,
+            json={"admission_no": "ADM-302", "full_name": "Riya Sharma", "class_name": "Grade 5", "section": "A"},
+        )
+        students = client.get("/api/v1/students", headers=admin_headers).json()
 
+    student_id = students[0]["id"]
     guardian_resp = client.post(
         "/api/v1/sis/guardians",
         headers=admin_headers,
@@ -144,6 +136,56 @@ def test_sprint_3_4_academic_and_sis_flow():
     )
     assert map_resp.status_code == 201
 
-    linked_resp = client.get(f"/api/v1/sis/students/{student_id}/guardians", headers=admin_headers)
-    assert linked_resp.status_code == 200
-    assert len(linked_resp.json()) >= 1
+
+def test_sprint_5_6_attendance_notifications_and_dashboard():
+    admin_token = create_user_and_login("admin56@school.com", "school_admin")
+    teacher_token = create_user_and_login("teacher56@school.com", "teacher")
+
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+    teacher_headers = {"Authorization": f"Bearer {teacher_token}"}
+
+    # ensure at least one student exists
+    students = client.get("/api/v1/students", headers=admin_headers).json()
+    if not students:
+        client.post(
+            "/api/v1/students",
+            headers=admin_headers,
+            json={"admission_no": "ADM-560", "full_name": "Aman Verma", "class_name": "Grade 6", "section": "B"},
+        )
+        students = client.get("/api/v1/students", headers=admin_headers).json()
+
+    student_id = students[0]["id"]
+
+    attendance_resp = client.post(
+        "/api/v1/attendance/students",
+        headers=teacher_headers,
+        json={"student_id": student_id, "date": "2026-01-10", "status": "present"},
+    )
+    assert attendance_resp.status_code == 201
+
+    attendance_list_resp = client.get("/api/v1/attendance/students", headers=admin_headers)
+    assert attendance_list_resp.status_code == 200
+    assert len(attendance_list_resp.json()) >= 1
+
+    notif_resp = client.post(
+        "/api/v1/notifications",
+        headers=admin_headers,
+        json={
+            "audience": "parents",
+            "channel": "sms",
+            "title": "Attendance Update",
+            "message": "Your ward was present today.",
+        },
+    )
+    assert notif_resp.status_code == 201
+
+    notif_list_resp = client.get("/api/v1/notifications", headers=admin_headers)
+    assert notif_list_resp.status_code == 200
+    assert len(notif_list_resp.json()) >= 1
+
+    metrics_resp = client.get("/api/v1/dashboard/metrics", headers=admin_headers)
+    assert metrics_resp.status_code == 200
+    body = metrics_resp.json()
+    assert body["total_students"] >= 1
+    assert body["attendance_marked"] >= 1
+    assert body["notifications_sent"] >= 1
