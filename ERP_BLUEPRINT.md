@@ -278,3 +278,39 @@ If you want, the next iteration can include:
 - starter schema migrations,
 - and scaffolded APIs for Auth, SIS, Attendance, Exams, and Fees.
 
+
+## 13) Delivery Status (Implemented Incrementally)
+
+- Sprint 1-2 (implemented):
+  - Backend scaffold with FastAPI
+  - Auth (register/login/me)
+  - RBAC guard utilities
+  - Tenant onboarding APIs
+  - School onboarding APIs
+  - Student create/list starter APIs
+- Sprint 3-4 (implemented):
+  - Academic setup APIs (academic years, classes, sections, subjects)
+  - SIS guardian profiles and student-guardian mapping APIs
+- Sprint 5-6 (implemented):
+  - Student attendance APIs
+  - Notification center APIs
+  - Basic dashboard metrics API
+- Sprint 7-8 (implemented):
+  - Exams APIs
+  - Student marks APIs
+  - Report card generation and listing APIs
+- Sprint 9-10 (implemented):
+  - Fee invoice APIs
+  - Fee payment and status update APIs
+- Sprint 11-12 (implemented):
+  - Parent portal student list API
+  - Parent portal dashboard metrics API
+  - Hardening validations for marks and payment mode
+  - UAT checklist added
+- Sprint 13-14 (implemented):
+  - Async notification queue APIs
+  - Audit logs and readiness ops APIs
+  - Additional hardening hooks
+  - Dockerfile and CI compile workflow
+- Sprint 15+ (next):
+  - Multi-tenant data isolation enforcement and external integrations

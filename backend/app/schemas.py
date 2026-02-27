@@ -43,6 +43,42 @@ class SchoolOut(SchoolCreate):
     id: int
 
 
+class AcademicYearCreate(BaseModel):
+    school_id: int
+    name: str
+
+
+class AcademicYearOut(AcademicYearCreate):
+    id: int
+
+
+class SchoolClassCreate(BaseModel):
+    school_id: int
+    name: str
+
+
+class SchoolClassOut(SchoolClassCreate):
+    id: int
+
+
+class SectionCreate(BaseModel):
+    class_id: int
+    name: str
+
+
+class SectionOut(SectionCreate):
+    id: int
+
+
+class SubjectCreate(BaseModel):
+    class_id: int
+    name: str
+
+
+class SubjectOut(SubjectCreate):
+    id: int
+
+
 class StudentCreate(BaseModel):
     admission_no: str
     full_name: str
@@ -52,3 +88,139 @@ class StudentCreate(BaseModel):
 
 class StudentOut(StudentCreate):
     id: int
+
+
+class GuardianCreate(BaseModel):
+    full_name: str
+    phone: str
+    relation: str
+
+
+class GuardianOut(GuardianCreate):
+    id: int
+
+
+class StudentGuardianMapCreate(BaseModel):
+    student_id: int
+    guardian_id: int
+
+
+class StudentGuardianMapOut(StudentGuardianMapCreate):
+    pass
+
+
+class AttendanceCreate(BaseModel):
+    student_id: int
+    date: str
+    status: str
+
+
+class AttendanceOut(AttendanceCreate):
+    id: int
+
+
+class NotificationCreate(BaseModel):
+    audience: str
+    channel: str
+    title: str
+    message: str
+
+
+class NotificationOut(NotificationCreate):
+    id: int
+
+
+class DashboardMetricsOut(BaseModel):
+    total_students: int
+    total_guardians: int
+    total_classes: int
+    attendance_marked: int
+    notifications_sent: int
+
+
+class ExamCreate(BaseModel):
+    name: str
+    academic_year: str
+
+
+class ExamOut(ExamCreate):
+    id: int
+
+
+class StudentMarkCreate(BaseModel):
+    student_id: int
+    exam_id: int
+    subject: str
+    marks_obtained: int
+    max_marks: int
+
+
+class StudentMarkOut(StudentMarkCreate):
+    id: int
+
+
+class ReportCardCreate(BaseModel):
+    student_id: int
+    exam_id: int
+
+
+class ReportCardOut(ReportCardCreate):
+    id: int
+    total_obtained: int
+    total_max: int
+    percentage: str
+
+
+class FeeInvoiceCreate(BaseModel):
+    student_id: int
+    term: str
+    amount_due: int
+    status: str = "due"
+
+
+class FeeInvoiceOut(FeeInvoiceCreate):
+    id: int
+
+
+class FeePaymentCreate(BaseModel):
+    invoice_id: int
+    amount_paid: int
+    payment_mode: str
+    transaction_ref: str
+
+
+class FeePaymentOut(FeePaymentCreate):
+    id: int
+
+
+class ParentStudentSummaryOut(BaseModel):
+    id: int
+    admission_no: str
+    full_name: str
+    class_name: str
+    section: str
+
+
+class ParentDashboardOut(BaseModel):
+    total_students: int
+    attendance_records: int
+    report_cards: int
+    fee_invoices: int
+    fee_due_count: int
+
+
+class NotificationDispatchCreate(BaseModel):
+    notification_id: int
+
+
+class NotificationDispatchOut(NotificationDispatchCreate):
+    id: int
+    status: str
+
+
+class AuditLogOut(BaseModel):
+    id: int
+    actor: str
+    action: str
+    entity: str
+    detail: str

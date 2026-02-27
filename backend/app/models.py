@@ -50,6 +50,38 @@ class User(Base):
     roles: Mapped[list[Role]] = relationship("Role", secondary="user_roles", lazy="joined")
 
 
+class AcademicYear(Base):
+    __tablename__ = "academic_years"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    school_id: Mapped[int] = mapped_column(ForeignKey("schools.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+
+
+class SchoolClass(Base):
+    __tablename__ = "school_classes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    school_id: Mapped[int] = mapped_column(ForeignKey("schools.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+
+
+class Section(Base):
+    __tablename__ = "sections"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    class_id: Mapped[int] = mapped_column(ForeignKey("school_classes.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(10), nullable=False)
+
+
+class Subject(Base):
+    __tablename__ = "subjects"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    class_id: Mapped[int] = mapped_column(ForeignKey("school_classes.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+
+
 class Student(Base):
     __tablename__ = "students"
 
@@ -58,3 +90,106 @@ class Student(Base):
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     class_name: Mapped[str] = mapped_column(String(50), nullable=False)
     section: Mapped[str] = mapped_column(String(10), nullable=False)
+
+
+class Guardian(Base):
+    __tablename__ = "guardians"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=False)
+    relation: Mapped[str] = mapped_column(String(30), nullable=False)
+
+
+class StudentGuardian(Base):
+    __tablename__ = "student_guardians"
+
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), primary_key=True)
+    guardian_id: Mapped[int] = mapped_column(ForeignKey("guardians.id"), primary_key=True)
+
+
+class StudentAttendance(Base):
+    __tablename__ = "student_attendance"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    date: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False)  # present/absent/late
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    audience: Mapped[str] = mapped_column(String(30), nullable=False)  # all/parents/students/staff
+    channel: Mapped[str] = mapped_column(String(20), nullable=False)  # sms/email/in_app
+    title: Mapped[str] = mapped_column(String(150), nullable=False)
+    message: Mapped[str] = mapped_column(String(1000), nullable=False)
+
+
+class Exam(Base):
+    __tablename__ = "exams"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    academic_year: Mapped[str] = mapped_column(String(30), nullable=False)
+
+
+class StudentMark(Base):
+    __tablename__ = "student_marks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    exam_id: Mapped[int] = mapped_column(ForeignKey("exams.id"), nullable=False, index=True)
+    subject: Mapped[str] = mapped_column(String(100), nullable=False)
+    marks_obtained: Mapped[int] = mapped_column(Integer, nullable=False)
+    max_marks: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class ReportCard(Base):
+    __tablename__ = "report_cards"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    exam_id: Mapped[int] = mapped_column(ForeignKey("exams.id"), nullable=False, index=True)
+    total_obtained: Mapped[int] = mapped_column(Integer, nullable=False)
+    total_max: Mapped[int] = mapped_column(Integer, nullable=False)
+    percentage: Mapped[str] = mapped_column(String(20), nullable=False)
+
+
+class FeeInvoice(Base):
+    __tablename__ = "fee_invoices"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    term: Mapped[str] = mapped_column(String(50), nullable=False)
+    amount_due: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="due")
+
+
+class FeePayment(Base):
+    __tablename__ = "fee_payments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    invoice_id: Mapped[int] = mapped_column(ForeignKey("fee_invoices.id"), nullable=False, index=True)
+    amount_paid: Mapped[int] = mapped_column(Integer, nullable=False)
+    payment_mode: Mapped[str] = mapped_column(String(20), nullable=False)  # cash/card/upi/bank
+    transaction_ref: Mapped[str] = mapped_column(String(100), nullable=False)
+
+
+class NotificationDispatch(Base):
+    __tablename__ = "notification_dispatches"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    notification_id: Mapped[int] = mapped_column(ForeignKey("notifications.id"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="queued")
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    actor: Mapped[str] = mapped_column(String(100), nullable=False)
+    action: Mapped[str] = mapped_column(String(100), nullable=False)
+    entity: Mapped[str] = mapped_column(String(100), nullable=False)
+    detail: Mapped[str] = mapped_column(String(1000), nullable=False)
