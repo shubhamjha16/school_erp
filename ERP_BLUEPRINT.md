@@ -351,3 +351,36 @@ If you want, the next iteration can include:
   - nginx.conf with SPA routing, API proxy, and static asset caching
   - .dockerignore for optimized build context
   - Production build verified: 0 errors, 1,785 modules, 87KB gzipped JS bundle
+
+### API Integration Delivery Status (Frontend ↔ Backend Wiring)
+
+- Sprint 0 (implemented):
+  - api.ts: VITE_API_URL env var + 401 auto-redirect to login
+  - hooks/useApi.ts: Custom data-fetching hook with loading/error states
+  - types.ts: 17 TypeScript interfaces matching backend Pydantic schemas
+- Sprint 1-2 (implemented):
+  - Login.tsx wired to POST /auth/login with JWT, demo fallback
+  - AdminLayout route guard + GET /auth/me for user info
+  - Onboarding.tsx wired to GET/POST /onboarding/tenants and /schools
+- Sprint 3-4 (implemented):
+  - Academics.tsx wired to GET /academic/classes
+  - Students.tsx wired to GET /students
+  - Guardians.tsx wired to GET /sis/guardians
+- Sprint 5-6 (implemented):
+  - Dashboard.tsx wired to GET /dashboard/metrics
+  - Attendance.tsx wired to GET /students + POST /attendance/students
+  - Notifications.tsx wired to GET/POST /notifications
+- Sprint 7-8 (implemented):
+  - Exams.tsx wired to POST /exams (create)
+  - ReportCards.tsx kept with rich mock UI (backend endpoints are per-student)
+- Sprint 9-10 (implemented):
+  - Fees.tsx wired to GET /fees/invoices + /payments with computed totals
+  - Invoices.tsx wired to GET/POST /fees/invoices
+- Sprint 11-12 (implemented):
+  - ParentDashboard.tsx wired to GET /parent/dashboard/{id}
+  - MyChildren.tsx wired to GET /parent/students/{id}
+- Sprint 13-14 (implemented):
+  - AuditLogs.tsx wired to GET /ops/audit-logs
+  - NotificationStatus.tsx wired to GET /notifications/queue
+  - All pages include mock fallback for offline/demo use
+  - Production build verified: 0 errors, 1,786 modules, 85KB gzipped JS
