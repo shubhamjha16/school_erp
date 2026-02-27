@@ -314,3 +314,40 @@ If you want, the next iteration can include:
   - Dockerfile and CI compile workflow
 - Sprint 15+ (next):
   - Multi-tenant data isolation enforcement and external integrations
+
+### Frontend Delivery Status (React + TypeScript + Vite)
+
+- Sprint 0 (implemented):
+  - Vite + React + TypeScript project scaffold
+  - Design system: CSS tokens, global utilities
+  - Reusable UI components: Button, Input, Card, Table, PageHeader
+- Sprint 1-2 (implemented):
+  - Login page with JWT stub auth flow
+  - AdminLayout with collapsible sidebar, dark mode toggle, responsive design
+  - Onboarding page: Tenant/School management with tabbed interface
+- Sprint 3-4 (implemented):
+  - Academics page: Academic Years, Classes, Sections, Subjects (tabbed)
+  - SIS Guardians page: Guardian profiles with student-guardian mapping
+  - SIS Students page: Student listing with enrollment management
+- Sprint 5-6 (implemented):
+  - Admin Dashboard: Metric cards, attendance trends, recent activity feed
+  - Attendance page: Row-by-row toggle (Present/Absent/Late) per student
+  - Communications page: SMS/Email/Push broadcast composer + message history
+- Sprint 7-8 (implemented):
+  - Exams page: Exam configuration + quick marks entry form
+  - Report Cards page: 3-tab UI (Generate & Publish, Published History, Student Preview)
+  - Subject-wise marks table with grade badges and rank display
+- Sprint 9-10 (implemented):
+  - Fees Collections page: Summary cards (Collected/Pending/Failed) + transaction table
+  - Invoices page: Invoice generation with fee type breakdown + status tracking
+- Sprint 11-12 (implemented):
+  - ParentLayout: Separate green-themed portal with own sidebar
+  - Parent Dashboard: Child metrics, recent updates feed, quick action buttons
+  - My Children page: Profile cards with attendance/grades/fee status per child
+- Sprint 13-14 (implemented):
+  - Audit Logs page: Filterable activity log with severity/action badges
+  - Notification Jobs page: Async delivery status with progress bars and error banners
+  - Dockerfile (multi-stage: node build → nginx serve)
+  - nginx.conf with SPA routing, API proxy, and static asset caching
+  - .dockerignore for optimized build context
+  - Production build verified: 0 errors, 1,785 modules, 87KB gzipped JS bundle
