@@ -1,0 +1,200 @@
+/* src/pages/operations/NotificationStatus.css */
+.notif-status-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+}
+
+.notif-summary-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5) !important;
+}
+
+.notif-summary-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.notif-summary-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.text-success {
+    color: var(--success-500);
+}
+
+.text-warning {
+    color: var(--warning-500);
+}
+
+.text-danger {
+    color: var(--danger-500);
+}
+
+/* Job Cards */
+.job-card-content {
+    padding: var(--space-5) !important;
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.job-id {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.job-type {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2px 0 0 0;
+}
+
+.job-status-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1.5);
+    padding: var(--space-1.5) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.job-status-pill.success {
+    background-color: var(--success-50);
+    color: var(--success-700);
+}
+
+.job-status-pill.warning {
+    background-color: var(--warning-50);
+    color: var(--warning-700);
+}
+
+.job-status-pill.danger {
+    background-color: var(--danger-50);
+    color: var(--danger-700);
+}
+
+[data-theme='dark'] .job-status-pill.success {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-400);
+}
+
+[data-theme='dark'] .job-status-pill.warning {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: var(--warning-400);
+}
+
+[data-theme='dark'] .job-status-pill.danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger-400);
+}
+
+.job-details-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.job-detail-label {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.job-detail-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Error Banner */
+.job-error-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--danger-50);
+    border: 1px solid var(--danger-200);
+    border-radius: var(--radius-md);
+    color: var(--danger-700);
+    font-size: 0.8rem;
+}
+
+[data-theme='dark'] .job-error-banner {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: var(--danger-400);
+}
+
+.job-error-banner span {
+    flex: 1;
+}
+
+/* Progress Bar */
+.job-progress-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.progress-track {
+    flex: 1;
+    height: 8px;
+    background-color: var(--neutral-100);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+[data-theme='dark'] .progress-track {
+    background-color: var(--neutral-800);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--warning-400), var(--warning-500));
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+.progress-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--warning-600);
+    min-width: 40px;
+}
+
+@media (max-width: 768px) {
+    .notif-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .job-details-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}

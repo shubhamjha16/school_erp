@@ -1,0 +1,242 @@
+/* src/components/layout/AdminLayout.css */
+.admin-layout {
+    display: flex;
+    height: 100vh;
+    background-color: var(--bg-app);
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--bg-surface);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 50;
+    position: relative;
+}
+
+.sidebar-header {
+    height: 64px;
+    padding: 0 var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    color: white;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    letter-spacing: -0.025em;
+}
+
+.mobile-close {
+    display: none;
+}
+
+/* Navigation */
+.sidebar-nav {
+    flex: 1;
+    padding: var(--space-4);
+    overflow-y: auto;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.nav-item {
+    margin: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-primary);
+}
+
+.nav-link.active {
+    background-color: var(--primary-50);
+    color: var(--primary-600);
+}
+
+[data-theme='dark'] .nav-link.active {
+    background-color: rgba(79, 134, 247, 0.1);
+    color: var(--primary-400);
+}
+
+.nav-icon {
+    flex-shrink: 0;
+}
+
+.sidebar-footer {
+    padding: var(--space-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.logout-btn {
+    width: 100%;
+    color: var(--danger-500);
+}
+
+.logout-btn:hover {
+    background-color: var(--danger-50);
+    color: var(--danger-600);
+}
+
+[data-theme='dark'] .logout-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Main Content Area */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.topbar {
+    height: 64px;
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-6);
+    z-index: 40;
+}
+
+.mobile-menu-btn {
+    display: none;
+    padding: var(--space-2);
+}
+
+.page-title {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.icon-btn:hover {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-primary);
+}
+
+.badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--danger-500);
+    border-radius: 50%;
+    border: 2px solid var(--bg-surface);
+}
+
+.user-profile {
+    margin-left: var(--space-2);
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background-color: var(--primary-100);
+    color: var(--primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-6);
+}
+
+.content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        backdrop-filter: blur(2px);
+    }
+
+    .mobile-close,
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    .topbar {
+        padding: 0 var(--space-4);
+    }
+
+    .main-content {
+        padding: var(--space-4);
+    }
+}

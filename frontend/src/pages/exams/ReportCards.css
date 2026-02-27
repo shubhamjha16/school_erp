@@ -1,0 +1,262 @@
+/* src/pages/exams/ReportCards.css */
+.report-cards-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.rc-status {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.rc-status.generated {
+    background-color: var(--success-50);
+    color: var(--success-600);
+}
+
+.rc-status.pending {
+    background-color: var(--warning-50);
+    color: var(--warning-600);
+}
+
+[data-theme='dark'] .rc-status.generated {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-500);
+}
+
+[data-theme='dark'] .rc-status.pending {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: var(--warning-500);
+}
+
+[data-theme='dark'] .bg-neutral-50 {
+    background-color: var(--neutral-800);
+}
+
+/* Tabs */
+.rc-tabs {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+}
+
+.rc-tab {
+    padding: var(--space-2.5) var(--space-4);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rc-tab:hover {
+    color: var(--text-primary);
+}
+
+.rc-tab.active {
+    color: var(--primary-600);
+    border-bottom-color: var(--primary-600);
+}
+
+[data-theme='dark'] .rc-tab.active {
+    color: var(--primary-400);
+    border-bottom-color: var(--primary-400);
+}
+
+/* Rank Badge */
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--neutral-100);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+}
+
+[data-theme='dark'] .rank-badge {
+    background: var(--neutral-800);
+}
+
+/* Grade Badge */
+.grade-badge {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.grade-badge.grade-Aplus {
+    background-color: var(--success-50);
+    color: var(--success-700);
+}
+
+.grade-badge.grade-A {
+    background-color: var(--primary-50);
+    color: var(--primary-700);
+}
+
+.grade-badge.grade-Bplus {
+    background-color: var(--warning-50);
+    color: var(--warning-700);
+}
+
+[data-theme='dark'] .grade-badge.grade-Aplus {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-400);
+}
+
+[data-theme='dark'] .grade-badge.grade-A {
+    background-color: rgba(79, 134, 247, 0.1);
+    color: var(--primary-400);
+}
+
+[data-theme='dark'] .grade-badge.grade-Bplus {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: var(--warning-400);
+}
+
+/* Preview Card */
+.rc-preview-container {
+    display: flex;
+    justify-content: center;
+}
+
+.rc-preview-card {
+    max-width: 700px;
+    width: 100%;
+}
+
+.rc-preview-content {
+    padding: var(--space-8) !important;
+}
+
+.rc-preview-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+    border-bottom: 2px solid var(--primary-500);
+    margin-bottom: var(--space-5);
+}
+
+.rc-school-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.rc-school-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.rc-exam-title {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 2px 0 0 0;
+}
+
+/* Student Info Grid */
+.rc-student-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+}
+
+.rc-info-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.rc-info-label {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.rc-info-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* Marks Table */
+.rc-marks-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-5);
+}
+
+.rc-marks-table th,
+.rc-marks-table td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rc-marks-table th {
+    background: var(--bg-primary);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rc-marks-table td {
+    color: var(--text-primary);
+}
+
+.rc-total-row {
+    background: var(--bg-primary);
+}
+
+.rc-total-row td {
+    border-bottom: none;
+}
+
+/* Preview Footer */
+.rc-preview-footer {
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.rc-preview-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+}

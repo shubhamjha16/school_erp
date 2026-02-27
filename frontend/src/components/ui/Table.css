@@ -1,0 +1,72 @@
+/* src/components/ui/Table.css */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.custom-table th {
+    background-color: var(--neutral-50);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+[data-theme='dark'] .custom-table th {
+    background-color: var(--neutral-800);
+}
+
+.custom-table td {
+    padding: var(--space-4);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+    background-color: var(--neutral-50);
+}
+
+[data-theme='dark'] .clickable-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-loading-state,
+.table-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12) var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.table-loading-state .loader {
+    width: 2rem;
+    height: 2rem;
+    border-color: var(--primary-500);
+    border-right-color: transparent;
+}

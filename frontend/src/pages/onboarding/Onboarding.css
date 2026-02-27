@@ -1,0 +1,83 @@
+/* src/pages/onboarding/Onboarding.css */
+.onboarding-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: var(--space-3) 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    color: var(--primary-600);
+    border-bottom-color: var(--primary-500);
+}
+
+[data-theme='dark'] .tab-btn.active {
+    color: var(--primary-400);
+    border-bottom-color: var(--primary-400);
+}
+
+.status-badge {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge.active {
+    background-color: var(--success-50);
+    color: var(--success-600);
+}
+
+.status-badge.pending {
+    background-color: var(--warning-50);
+    color: var(--warning-600);
+}
+
+[data-theme='dark'] .status-badge.active {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-500);
+}
+
+[data-theme='dark'] .status-badge.pending {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: var(--warning-500);
+}
+
+.mt-4 {
+    margin-top: var(--space-4);
+}
+
+.p-8 {
+    padding: var(--space-8);
+}
+
+.border-dashed {
+    border-style: dashed;
+}
+
+.rounded-md {
+    border-radius: var(--radius-md);
+}

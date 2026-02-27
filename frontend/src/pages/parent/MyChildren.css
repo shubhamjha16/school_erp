@@ -1,0 +1,104 @@
+/* src/pages/parent/MyChildren.css */
+.my-children-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.children-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-6);
+}
+
+.child-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-6) !important;
+    text-align: center;
+}
+
+.child-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--success-400), var(--success-600));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.child-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.child-class {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+}
+
+.child-roll {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    margin-bottom: var(--space-4);
+}
+
+.child-stats {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--space-4);
+}
+
+.child-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.child-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.child-stat-value {
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.child-stat-value.success {
+    color: var(--success-600);
+}
+
+.child-stat-value.primary {
+    color: var(--primary-600);
+}
+
+.child-stat-value.warning {
+    color: var(--warning-600);
+}
+
+[data-theme='dark'] .child-stat-value.success {
+    color: var(--success-500);
+}
+
+[data-theme='dark'] .child-stat-value.primary {
+    color: var(--primary-400);
+}
+
+[data-theme='dark'] .child-stat-value.warning {
+    color: var(--warning-500);
+}

@@ -1,0 +1,42 @@
+/* src/pages/fees/Invoices.css */
+.invoices-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.invoice-status {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.invoice-status.paid {
+    background-color: var(--success-50);
+    color: var(--success-600);
+}
+
+.invoice-status.unpaid {
+    background-color: var(--neutral-100);
+    color: var(--neutral-700);
+}
+
+.invoice-status.overdue {
+    background-color: var(--danger-50);
+    color: var(--danger-600);
+}
+
+[data-theme='dark'] .invoice-status.paid {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-500);
+}
+
+[data-theme='dark'] .invoice-status.unpaid {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--neutral-300);
+}
+
+[data-theme='dark'] .invoice-status.overdue {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger-500);
+}

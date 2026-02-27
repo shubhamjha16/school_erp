@@ -1,0 +1,51 @@
+/* src/pages/sis/Students.css */
+.students-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-status {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.student-status.enrolled {
+    background-color: var(--success-50);
+    color: var(--success-600);
+}
+
+[data-theme='dark'] .student-status.enrolled {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-500);
+}
+
+.guardian-link {
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.guardian-link:hover {
+    text-decoration: underline;
+    color: var(--primary-600);
+}
+
+[data-theme='dark'] .guardian-link:hover {
+    color: var(--primary-400);
+}
+
+.student-search-input {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: transparent;
+    width: 250px;
+    color: var(--text-primary);
+}
+
+.student-search-input:focus {
+    outline: none;
+    border-color: var(--primary-400);
+}

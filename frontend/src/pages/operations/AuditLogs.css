@@ -1,0 +1,101 @@
+/* src/pages/operations/AuditLogs.css */
+.audit-logs-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.action-badge {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.action-badge.login {
+    background-color: var(--primary-50);
+    color: var(--primary-700);
+}
+
+.action-badge.create {
+    background-color: var(--success-50);
+    color: var(--success-700);
+}
+
+.action-badge.update {
+    background-color: var(--warning-50);
+    color: var(--warning-700);
+}
+
+.action-badge.delete {
+    background-color: var(--danger-50);
+    color: var(--danger-700);
+}
+
+.action-badge.cron {
+    background-color: var(--neutral-100);
+    color: var(--neutral-700);
+}
+
+[data-theme='dark'] .action-badge.login {
+    background-color: rgba(79, 134, 247, 0.1);
+    color: var(--primary-400);
+}
+
+[data-theme='dark'] .action-badge.create {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success-500);
+}
+
+[data-theme='dark'] .action-badge.update {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: var(--warning-500);
+}
+
+[data-theme='dark'] .action-badge.delete {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger-500);
+}
+
+[data-theme='dark'] .action-badge.cron {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--neutral-300);
+}
+
+.severity-badge {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.severity-badge.info {
+    background-color: var(--primary-50);
+    color: var(--primary-600);
+}
+
+.severity-badge.warning {
+    background-color: var(--warning-50);
+    color: var(--warning-600);
+}
+
+.severity-badge.critical {
+    background-color: var(--danger-50);
+    color: var(--danger-600);
+}
+
+[data-theme='dark'] .severity-badge.info {
+    background-color: rgba(79, 134, 247, 0.1);
+    color: var(--primary-400);
+}
+
+[data-theme='dark'] .severity-badge.warning {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: var(--warning-500);
+}
+
+[data-theme='dark'] .severity-badge.critical {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger-500);
+}
