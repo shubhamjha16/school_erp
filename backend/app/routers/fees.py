@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..deps import get_current_user, require_roles
-from ..models import FeeInvoice, FeePayment, Student, User
+from ..deps import ensure_student_in_scope, get_current_user, get_user_school_ids, require_roles
+from ..models import FeeInvoice, FeePayment, Student, StudentSchool, User
 from ..schemas import FeeInvoiceCreate, FeeInvoiceOut, FeePaymentCreate, FeePaymentOut
 
 router = APIRouter(prefix="/fees", tags=["fees"])
@@ -13,11 +13,13 @@ router = APIRouter(prefix="/fees", tags=["fees"])
 def create_invoice(
     payload: FeeInvoiceCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("school_admin", "principal", "accountant")),
+    user: User = Depends(require_roles("school_admin", "principal", "accountant")),
 ):
     student = db.query(Student).filter(Student.id == payload.student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
+
+    ensure_student_in_scope(db, payload.student_id, user)
 
     invoice = FeeInvoice(**payload.model_dump())
     db.add(invoice)
@@ -36,11 +38,13 @@ def create_invoice(
 def record_payment(
     payload: FeePaymentCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("school_admin", "principal", "accountant")),
+    user: User = Depends(require_roles("school_admin", "principal", "accountant")),
 ):
     invoice = db.query(FeeInvoice).filter(FeeInvoice.id == payload.invoice_id).first()
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
+
+    ensure_student_in_scope(db, invoice.student_id, user)
 
     if payload.amount_paid <= 0:
         raise HTTPException(status_code=400, detail="Invalid amount")
@@ -61,7 +65,6 @@ def record_payment(
 
     db.commit()
     db.refresh(payment)
-    db.refresh(invoice)
 
     return FeePaymentOut(
         id=payment.id,
@@ -75,9 +78,13 @@ def record_payment(
 @router.get("/invoices", response_model=list[FeeInvoiceOut])
 def list_invoices(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
-    rows = db.query(FeeInvoice).order_by(FeeInvoice.id.asc()).all()
+    school_ids = get_user_school_ids(db, user)
+    q = db.query(FeeInvoice)
+    if school_ids:
+        q = q.join(StudentSchool, StudentSchool.student_id == FeeInvoice.student_id).filter(StudentSchool.school_id.in_(school_ids))
+    rows = q.order_by(FeeInvoice.id.asc()).all()
     return [
         FeeInvoiceOut(
             id=r.id,
@@ -93,9 +100,17 @@ def list_invoices(
 @router.get("/payments", response_model=list[FeePaymentOut])
 def list_payments(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
-    rows = db.query(FeePayment).order_by(FeePayment.id.asc()).all()
+    school_ids = get_user_school_ids(db, user)
+    q = db.query(FeePayment)
+    if school_ids:
+        q = (
+            q.join(FeeInvoice, FeeInvoice.id == FeePayment.invoice_id)
+            .join(StudentSchool, StudentSchool.student_id == FeeInvoice.student_id)
+            .filter(StudentSchool.school_id.in_(school_ids))
+        )
+    rows = q.order_by(FeePayment.id.asc()).all()
     return [
         FeePaymentOut(
             id=r.id,

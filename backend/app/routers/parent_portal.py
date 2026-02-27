@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..deps import require_roles
-from ..models import FeeInvoice, Guardian, ReportCard, Student, StudentAttendance, StudentGuardian, User
+from ..deps import get_user_school_ids, require_roles
+from ..models import FeeInvoice, Guardian, ReportCard, Student, StudentAttendance, StudentGuardian, StudentSchool, User
 from ..schemas import ParentDashboardOut, ParentStudentSummaryOut
 
 router = APIRouter(prefix="/parent", tags=["parent_portal"])
@@ -13,19 +13,24 @@ router = APIRouter(prefix="/parent", tags=["parent_portal"])
 def list_guardian_students(
     guardian_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("parent", "school_admin", "principal")),
+    user: User = Depends(require_roles("parent", "school_admin", "principal")),
 ):
     guardian = db.query(Guardian).filter(Guardian.id == guardian_id).first()
     if not guardian:
         raise HTTPException(status_code=404, detail="Guardian not found")
 
-    rows = (
+    school_ids = get_user_school_ids(db, user)
+    rows_query = (
         db.query(Student)
         .join(StudentGuardian, Student.id == StudentGuardian.student_id)
         .filter(StudentGuardian.guardian_id == guardian_id)
-        .order_by(Student.id.asc())
-        .all()
     )
+    if school_ids:
+        rows_query = rows_query.join(StudentSchool, StudentSchool.student_id == Student.id).filter(
+            StudentSchool.school_id.in_(school_ids)
+        )
+
+    rows = rows_query.order_by(Student.id.asc()).all()
 
     return [
         ParentStudentSummaryOut(
@@ -43,13 +48,20 @@ def list_guardian_students(
 def parent_dashboard(
     guardian_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("parent", "school_admin", "principal")),
+    user: User = Depends(require_roles("parent", "school_admin", "principal")),
 ):
     guardian = db.query(Guardian).filter(Guardian.id == guardian_id).first()
     if not guardian:
         raise HTTPException(status_code=404, detail="Guardian not found")
 
-    links = db.query(StudentGuardian).filter(StudentGuardian.guardian_id == guardian_id).all()
+    school_ids = get_user_school_ids(db, user)
+    links_query = db.query(StudentGuardian).filter(StudentGuardian.guardian_id == guardian_id)
+    if school_ids:
+        links_query = links_query.join(StudentSchool, StudentSchool.student_id == StudentGuardian.student_id).filter(
+            StudentSchool.school_id.in_(school_ids)
+        )
+
+    links = links_query.all()
     student_ids = [l.student_id for l in links]
 
     if not student_ids:

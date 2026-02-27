@@ -11,6 +11,20 @@ class UserRole(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), primary_key=True)
 
 
+class UserSchool(Base):
+    __tablename__ = "user_schools"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    school_id: Mapped[int] = mapped_column(ForeignKey("schools.id"), primary_key=True, index=True)
+
+
+class StudentSchool(Base):
+    __tablename__ = "student_schools"
+
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), primary_key=True)
+    school_id: Mapped[int] = mapped_column(ForeignKey("schools.id"), primary_key=True, index=True)
+
+
 class Tenant(Base):
     __tablename__ = "tenants"
 

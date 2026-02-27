@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .models import User
+from .models import StudentSchool, User, UserSchool
 from .security import decode_access_token
 
 bearer = HTTPBearer(auto_error=False)
@@ -34,3 +34,28 @@ def require_roles(*allowed: str):
         return user
 
     return role_checker
+
+
+def get_user_school_ids(db: Session, user: User) -> list[int]:
+    role_names = {r.name for r in user.roles}
+    if "super_admin" in role_names:
+        return []
+
+    school_ids = [row.school_id for row in db.query(UserSchool).filter(UserSchool.user_id == user.id).all()]
+    if not school_ids:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not mapped to any school")
+    return school_ids
+
+
+def ensure_student_in_scope(db: Session, student_id: int, user: User) -> None:
+    school_ids = get_user_school_ids(db, user)
+    if not school_ids:
+        return
+
+    exists = (
+        db.query(StudentSchool)
+        .filter(StudentSchool.student_id == student_id, StudentSchool.school_id.in_(school_ids))
+        .first()
+    )
+    if not exists:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student is outside your school scope")
