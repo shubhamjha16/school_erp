@@ -125,3 +125,33 @@ class Notification(Base):
     channel: Mapped[str] = mapped_column(String(20), nullable=False)  # sms/email/in_app
     title: Mapped[str] = mapped_column(String(150), nullable=False)
     message: Mapped[str] = mapped_column(String(1000), nullable=False)
+
+
+class Exam(Base):
+    __tablename__ = "exams"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    academic_year: Mapped[str] = mapped_column(String(30), nullable=False)
+
+
+class StudentMark(Base):
+    __tablename__ = "student_marks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    exam_id: Mapped[int] = mapped_column(ForeignKey("exams.id"), nullable=False, index=True)
+    subject: Mapped[str] = mapped_column(String(100), nullable=False)
+    marks_obtained: Mapped[int] = mapped_column(Integer, nullable=False)
+    max_marks: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class ReportCard(Base):
+    __tablename__ = "report_cards"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    exam_id: Mapped[int] = mapped_column(ForeignKey("exams.id"), nullable=False, index=True)
+    total_obtained: Mapped[int] = mapped_column(Integer, nullable=False)
+    total_max: Mapped[int] = mapped_column(Integer, nullable=False)
+    percentage: Mapped[str] = mapped_column(String(20), nullable=False)

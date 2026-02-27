@@ -189,3 +189,55 @@ def test_sprint_5_6_attendance_notifications_and_dashboard():
     assert body["total_students"] >= 1
     assert body["attendance_marked"] >= 1
     assert body["notifications_sent"] >= 1
+
+
+def test_sprint_7_8_exams_marks_report_cards():
+    admin_token = create_user_and_login("admin78@school.com", "school_admin")
+    teacher_token = create_user_and_login("teacher78@school.com", "teacher")
+
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+    teacher_headers = {"Authorization": f"Bearer {teacher_token}"}
+
+    students = client.get("/api/v1/students", headers=admin_headers).json()
+    if not students:
+        client.post(
+            "/api/v1/students",
+            headers=admin_headers,
+            json={"admission_no": "ADM-780", "full_name": "Kabir Singh", "class_name": "Grade 8", "section": "A"},
+        )
+        students = client.get("/api/v1/students", headers=admin_headers).json()
+
+    student_id = students[0]["id"]
+
+    exam_resp = client.post(
+        "/api/v1/exams",
+        headers=admin_headers,
+        json={"name": "Term 1", "academic_year": "2026-27"},
+    )
+    assert exam_resp.status_code == 201
+    exam_id = exam_resp.json()["id"]
+
+    mark_resp = client.post(
+        "/api/v1/exams/marks",
+        headers=teacher_headers,
+        json={
+            "student_id": student_id,
+            "exam_id": exam_id,
+            "subject": "Mathematics",
+            "marks_obtained": 87,
+            "max_marks": 100,
+        },
+    )
+    assert mark_resp.status_code == 201
+
+    report_resp = client.post(
+        "/api/v1/exams/report-cards",
+        headers=admin_headers,
+        json={"student_id": student_id, "exam_id": exam_id},
+    )
+    assert report_resp.status_code == 201
+    assert int(float(report_resp.json()["percentage"])) >= 0
+
+    list_resp = client.get(f"/api/v1/exams/report-cards/{student_id}", headers=admin_headers)
+    assert list_resp.status_code == 200
+    assert len(list_resp.json()) >= 1

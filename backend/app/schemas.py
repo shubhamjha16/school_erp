@@ -136,3 +136,36 @@ class DashboardMetricsOut(BaseModel):
     total_classes: int
     attendance_marked: int
     notifications_sent: int
+
+
+class ExamCreate(BaseModel):
+    name: str
+    academic_year: str
+
+
+class ExamOut(ExamCreate):
+    id: int
+
+
+class StudentMarkCreate(BaseModel):
+    student_id: int
+    exam_id: int
+    subject: str
+    marks_obtained: int
+    max_marks: int
+
+
+class StudentMarkOut(StudentMarkCreate):
+    id: int
+
+
+class ReportCardCreate(BaseModel):
+    student_id: int
+    exam_id: int
+
+
+class ReportCardOut(ReportCardCreate):
+    id: int
+    total_obtained: int
+    total_max: int
+    percentage: str

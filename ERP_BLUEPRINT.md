@@ -295,5 +295,9 @@ If you want, the next iteration can include:
   - Student attendance APIs
   - Notification center APIs
   - Basic dashboard metrics API
-- Sprint 7+ (next):
-  - Exams, fee module, parent portal
+- Sprint 7-8 (implemented):
+  - Exams APIs
+  - Student marks APIs
+  - Report card generation and listing APIs
+- Sprint 9+ (next):
+  - Fee module, parent portal
